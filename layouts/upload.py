@@ -8,7 +8,7 @@ upload_layout = dbc.Modal(
             [
                 dcc.Upload(
                     id="upload-data",
-                    children=html.Div(["Drag and drop or click to upload a file"]),
+                    children=html.Div(['Drag and drop or ', html.A('Select Files')]),
                     style={
                         "width": "100%",
                         "height": "60px",

@@ -4,7 +4,9 @@ import base64, io
 from io import StringIO
 from dash import html, dcc
 import plotly.express as px
-import dash_bootstrap_components as dbc  # Import dbc for layout components
+import dash_bootstrap_components as dbc
+from layouts.main_content import main_content
+from layouts.model_fitting import model_fitting_layout
 
 def process_data(df):
     """Helper function to generate content from a DataFrame."""
@@ -37,26 +39,43 @@ def process_data(df):
         className="scrollable-overview-table",
     )
     
-    # Combine content
-    content = html.Div([
-        dcc.Graph(figure=fig),
-        dbc.Row([
-            dbc.Col([
-                html.H4("Data Description"),
-                description_table,
-            ], className="table-column"),
-            dbc.Col([
-                html.H4("Data Overview"),
-                overview_table_scrollable,
-            ], className="table-column"),
-        ]),
+    # Content layout with sidebar on the left and main content on the right
+    content = dbc.Row([
+        # Sidebar column (fixed size)
+        dbc.Col([
+            html.H4("Sidebar Content"),
+            html.P("Additional content like filters or options can go here."),
+        ], width=2),  # Sidebar takes up 2 out of 12 columns
+        
+        # Main content column
+        dbc.Col([
+            # First Row: Graph takes full width
+            dbc.Row(
+                dbc.Col(
+                    dcc.Graph(figure=fig),
+                    width=12  # Full width for the graph
+                )
+            ),
+            # Second Row: Description and Overview Tables
+            dbc.Row([
+                dbc.Col([
+                    html.H4("Data Description"),
+                    description_table,
+                ], width=6),  # Half the width for description
+                
+                dbc.Col([
+                    html.H4("Data Overview"),
+                    overview_table_scrollable,
+                ], width=6),  # Half the width for overview
+            ]),
+        ], width=10),  # Main content takes up 10 out of 12 columns
     ])
     return content
 
 def register_callbacks(app):
     @app.callback(
         [
-            Output("main-content", "children"),
+            Output("dynamic-layout", "children"),
             Output("upload-modal", "is_open"),
             Output("upload-status", "children"),
             Output("uploaded-data-store", "data"),
@@ -74,45 +93,44 @@ def register_callbacks(app):
             State("upload-data", "filename"),
         ],
     )
-    def handle_content_and_upload(pathname, open_clicks, close_clicks, file_contents, delete_clicks, stored_data, is_open, filename):
+    def handle_upload_and_data(pathname, open_clicks, close_clicks, file_contents, delete_clicks, stored_data, is_open, filename):
         ctx = callback_context
         triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
+        # Handling the default case when no file is uploaded and the delete button isn't clicked
         if delete_clicks is None:
             delete_clicks = 0
 
-        # Handle page navigation
+        # Handle page navigation based on the URL
         if triggered_id == "url":
             if pathname == "/forecast":
-                return html.Div("Forecast page coming soon!"), is_open, "", None
+                return model_fitting_layout, is_open, "", None
             elif pathname == "/results":
                 return html.Div("Results page coming soon!"), is_open, "", None
             else:
-                return html.H3("Welcome to the Murtfeldt TimeSeries Analysis Dashboard!"), is_open, "", None
+                return main_content, is_open, "", None  # Default layout
 
         # Handle modal toggle
         if triggered_id in ["open-upload-modal", "close-upload-modal"]:
             is_open = not is_open
 
-        # Clear uploaded data
+        # Clear uploaded data when the delete button is clicked
         if delete_clicks > 0:
-            return html.H3("Welcome to the Murtfeldt TimeSeries Analysis Dashboard!"), is_open, "Uploaded data deleted", None
+            return main_content, is_open, "Uploaded data deleted", None
 
-        # Handle stored or uploaded data
+        # Handle file upload or session data
         if stored_data or file_contents:
-            # Only process file_contents if it is valid (not an integer or None)
             if isinstance(file_contents, str):
                 content_type, content_string = file_contents.split(",")
                 decoded = base64.b64decode(content_string)
                 df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
                 stored_data = df.to_json(date_format="iso", orient="split")
             else:
-                # If file_contents is not a valid string, load data from session storage
                 df = pd.read_json(StringIO(stored_data), orient="split")
-            
+
             content = process_data(df)
             message = f"File {filename} uploaded successfully!" if file_contents else "Data loaded from session storage"
             return content, is_open, message, stored_data
 
-        # Default response
-        return html.H3("Welcome to the Murtfeldt TimeSeries Analysis Dashboard!"), is_open, "", None
+        # Default response if no file is uploaded
+        return main_content, is_open, "", None

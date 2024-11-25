@@ -17,6 +17,7 @@ sidebar_layout = html.Div(
         dbc.Nav(
             [
                 dbc.NavLink("Home", href="/", active="exact"),
+                dbc.NavLink("Model Fitting", href="/model", active="exact"),
                 dbc.NavLink("Forecast", href="/forecast", active="exact"),
             ],
             vertical=True,
