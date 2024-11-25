@@ -1,0 +1,35 @@
+/* Scrollable overview table */
+.scrollable-overview-table {
+    height: 300px;  /* Set a fixed height */
+    overflow-y: auto;  /* Enable vertical scrolling when content exceeds height */
+    margin-top: 10px;
+}
+
+/* Container for tables side by side */
+.table-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Individual table containers */
+.table-column {
+    width: 48%;  /* Each table takes up 48% of the width */
+}
+
+/* Optional: Add margin to separate tables */
+.table-column + .table-column {
+    margin-left: 2%;  /* Add margin between tables */
+}
+
+/* Main container style */
+.main-container {
+    margin-left: 250px;
+    background-color: #f8f9fa;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* Content padding for main content */
+.main-content {
+    padding: 20px;
+}
