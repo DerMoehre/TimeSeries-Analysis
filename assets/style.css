@@ -20,16 +20,3 @@
 .table-column + .table-column {
     margin-left: 2%;  /* Add margin between tables */
 }
-
-/* Main container style */
-.main-container {
-    margin-left: 250px;
-    background-color: #f8f9fa;
-    height: 100vh;
-    overflow-y: auto;
-}
-
-/* Content padding for main content */
-.main-content {
-    padding: 20px;
-}

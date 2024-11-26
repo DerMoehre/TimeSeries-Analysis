@@ -2,14 +2,13 @@ from dash import Dash, dcc, html, Output, Input
 import dash_bootstrap_components as dbc
 from layouts.sidebar import sidebar_layout
 from layouts.main_content import main_content
-from layouts.model_fitting import model_fitting_layout
-from layouts.upload import upload_layout
+from layouts.modal import modal_layout
 from callbacks import register_callbacks
 
 # Initialize app
 app = Dash(
     __name__,
-    external_stylesheets=[dbc.themes.BOOTSTRAP],
+    external_stylesheets=[dbc.themes.FLATLY],
     suppress_callback_exceptions=True,
 )
 app.title = "Murtfeldt TimeSeries Analysis"
@@ -18,19 +17,16 @@ app.title = "Murtfeldt TimeSeries Analysis"
 app.layout = html.Div([
     dcc.Location(id="url"),
     dcc.Store(id="uploaded-data-store", storage_type="session"),
-    sidebar_layout,
-    html.Div(id="dynamic-layout", className="dynamic-layout"),
-    upload_layout,  # Upload layout remains in the main app layout
+    dbc.Row([
+        dbc.Col(sidebar_layout, width=2),  # Static sidebar
+        dbc.Col(html.Div(id="main-content"), width=10),  # Dynamic main content
+    ]),
+    modal_layout
 ])
 
-# Callback to update the layout dynamically based on the URL
-#@app.callback(
-#    Output("dynamic-layout", "children"),
-#    Input("url", "pathname"),
-#)
 def update_layout(pathname):
-    if pathname == "/model-fitting":
-        return model_fitting_layout  # Render model fitting page
+    if pathname == "/model":
+        return html.Div("404: Page not found.", className="error-page")  # Render model fitting page
     elif pathname == "/":  # Default page
         return main_content
     else:

@@ -1,5 +1,6 @@
 import dash_bootstrap_components as dbc
 from dash import html
+from layouts.modal import modal_layout
 
 sidebar_layout = html.Div(
     [
@@ -25,8 +26,8 @@ sidebar_layout = html.Div(
         ),
         html.Hr(),
         dbc.Button("Upload Data", id="open-upload-modal", color="primary", className="mt-3"),
-        dbc.Button("Delete Uploaded Data", id="delete-data-button", color="danger", n_clicks=0)
-
+        dbc.Button("Delete Uploaded Data", id="delete-data-button", color="danger", n_clicks=0),
+        modal_layout
     ],
     style={
         "position": "fixed",

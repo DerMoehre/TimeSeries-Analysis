@@ -1,18 +1,15 @@
 from dash import Input, Output, State, callback_context
 import pandas as pd
 import base64, io
-from io import StringIO
 from dash import html, dcc
 import plotly.express as px
-import dash_bootstrap_components as dbc
 from layouts.main_content import main_content
-from layouts.model_fitting import model_fitting_layout
+import dash_bootstrap_components as dbc
 
 def process_data(df):
     """Helper function to generate content from a DataFrame."""
-    # Generate graph
+    # Graph
     fig = px.line(df, x="Time", y="Revenue", title="Uploaded Data Plot")
-    
     # Data description
     description = df.describe()
     description.insert(0, "Metric", description.index)
@@ -32,105 +29,54 @@ def process_data(df):
             for row in range(len(df))
         ])
     ])
-    
+
     # Scrollable overview table
     overview_table_scrollable = html.Div(
         overview_table,
         className="scrollable-overview-table",
     )
-    
-    # Content layout with sidebar on the left and main content on the right
-    content = dbc.Row([
-        # Sidebar column (fixed size)
-        dbc.Col([
-            html.H4("Sidebar Content"),
-            html.P("Additional content like filters or options can go here."),
-        ], width=2),  # Sidebar takes up 2 out of 12 columns
-        
-        # Main content column
-        dbc.Col([
-            # First Row: Graph takes full width
-            dbc.Row(
-                dbc.Col(
-                    dcc.Graph(figure=fig),
-                    width=12  # Full width for the graph
-                )
-            ),
-            # Second Row: Description and Overview Tables
-            dbc.Row([
-                dbc.Col([
-                    html.H4("Data Description"),
-                    description_table,
-                ], width=6),  # Half the width for description
-                
-                dbc.Col([
-                    html.H4("Data Overview"),
-                    overview_table_scrollable,
-                ], width=6),  # Half the width for overview
-            ]),
-        ], width=10),  # Main content takes up 10 out of 12 columns
+
+    # Return content
+    return html.Div([
+        dcc.Graph(figure=fig),
+        dbc.Row([
+            dbc.Col(description_table, width=6),  # Description table on the left
+            dbc.Col(overview_table_scrollable, width=6),  # Overview table on the right
+        ])
     ])
-    return content
 
 def register_callbacks(app):
+    # Callback to handle the file upload and update the main content
     @app.callback(
-        [
-            Output("dynamic-layout", "children"),
-            Output("upload-modal", "is_open"),
-            Output("upload-status", "children"),
-            Output("uploaded-data-store", "data"),
-        ],
-        [
-            Input("url", "pathname"),
-            Input("open-upload-modal", "n_clicks"),
-            Input("close-upload-modal", "n_clicks"),
-            Input("upload-data", "contents"),
-            Input('delete-data-button', 'n_clicks'),
-            Input("uploaded-data-store", "data"),
-        ],
-        [
-            State("upload-modal", "is_open"),
-            State("upload-data", "filename"),
-        ],
+        Output("main-content", "children"),
+        [Input("url", "pathname"),
+         Input("upload-data", "contents")],
+        [State("upload-data", "filename")]
     )
-    def handle_upload_and_data(pathname, open_clicks, close_clicks, file_contents, delete_clicks, stored_data, is_open, filename):
-        ctx = callback_context
-        triggered_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    def update_main_content(pathname, contents, filename=None):
+        if contents is None or contents == "":
+            return html.Div("No file uploaded yet.")
 
-        # Handling the default case when no file is uploaded and the delete button isn't clicked
-        if delete_clicks is None:
-            delete_clicks = 0
+        # Check if contents has the expected format
+        if ',' not in contents:
+            return html.Div("Invalid file format.")
 
-        # Handle page navigation based on the URL
-        if triggered_id == "url":
-            if pathname == "/forecast":
-                return model_fitting_layout, is_open, "", None
-            elif pathname == "/results":
-                return html.Div("Results page coming soon!"), is_open, "", None
-            else:
-                return main_content, is_open, "", None  # Default layout
+        content_type, content_string = contents.split(',', 1)  # Split into two parts (max 1 split)
 
-        # Handle modal toggle
-        if triggered_id in ["open-upload-modal", "close-upload-modal"]:
-            is_open = not is_open
+        try:
+            decoded = base64.b64decode(content_string)
+            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
+            return process_data(df)
+        except Exception as e:
+            return html.Div(f"Error processing the file: {str(e)}")
 
-        # Clear uploaded data when the delete button is clicked
-        if delete_clicks > 0:
-            return main_content, is_open, "Uploaded data deleted", None
-
-        # Handle file upload or session data
-        if stored_data or file_contents:
-            if isinstance(file_contents, str):
-                content_type, content_string = file_contents.split(",")
-                decoded = base64.b64decode(content_string)
-                df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
-                stored_data = df.to_json(date_format="iso", orient="split")
-            else:
-                df = pd.read_json(StringIO(stored_data), orient="split")
-
-            content = process_data(df)
-            message = f"File {filename} uploaded successfully!" if file_contents else "Data loaded from session storage"
-            return content, is_open, message, stored_data
-
-        # Default response if no file is uploaded
-        return main_content, is_open, "", None
+    # Callback to toggle the modal's visibility when the "Upload Data" button is clicked
+    @app.callback(
+        Output("upload-modal", "is_open"),
+        [Input("open-upload-modal", "n_clicks")],
+        [State("upload-modal", "is_open")]
+    )
+    def toggle_modal(n_clicks, is_open):
+        if n_clicks:
+            return not is_open
+        return is_open
