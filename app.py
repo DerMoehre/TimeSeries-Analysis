@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 from layouts.sidebar import sidebar_layout
 from layouts.main_content import main_content
 from layouts.modal import modal_layout
+from layouts.overview import overview_layout
 from callbacks import register_callbacks
 
 # Initialize app
@@ -24,13 +25,19 @@ app.layout = html.Div([
     modal_layout
 ])
 
+# Callback to update the main content based on the URL
+@app.callback(
+    Output("main-content", "children"),
+    Input("url", "pathname")  # Listen to changes in the URL pathname
+)
 def update_layout(pathname):
     if pathname == "/model":
-        return html.Div("404: Page not found.", className="error-page")  # Render model fitting page
-    elif pathname == "/":  # Default page
-        return main_content
-    else:
-        return html.Div("404: Page not found.", className="error-page")  # Handle unknown URLs
+        return html.Div("404: Page not found.", className="error-page")
+    elif pathname == "/":  # Home page
+        return overview_layout()  # Use overview layout for the home page
+    else:  # Handle unknown URLs
+        return html.Div("404: Page not found.", className="error-page")
+
 
 # Register callbacks
 register_callbacks(app)

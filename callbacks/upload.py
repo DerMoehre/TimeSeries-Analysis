@@ -37,39 +37,28 @@ def process_data(df):
     )
 
     # Return content
-    return html.Div([
-        dcc.Graph(figure=fig),
-        dbc.Row([
-            dbc.Col(description_table, width=6),  # Description table on the left
-            dbc.Col(overview_table_scrollable, width=6),  # Overview table on the right
-        ])
-    ])
+    return fig, description_table, overview_table_scrollable
 
 def register_callbacks(app):
-    # Callback to handle the file upload and update the main content
     @app.callback(
-        Output("main-content", "children"),
-        [Input("url", "pathname"),
-         Input("upload-data", "contents")],
-        [State("upload-data", "filename")]
+        [Output("overview-graph", "figure"),
+         Output("description-table", "children"),
+         Output("overview-table", "children")],
+        Input("upload-data", "contents")
     )
-    def update_main_content(pathname, contents, filename=None):
-        if contents is None or contents == "":
-            return html.Div("No file uploaded yet.")
+    def update_overview(contents):
+        if contents is None:
+            return {}, "No data available", "No data available"
 
-        # Check if contents has the expected format
-        if ',' not in contents:
-            return html.Div("Invalid file format.")
-
-        content_type, content_string = contents.split(',', 1)  # Split into two parts (max 1 split)
-
+        content_type, content_string = contents.split(",", 1)
+        decoded = base64.b64decode(content_string)
+        
         try:
-            decoded = base64.b64decode(content_string)
-            df = pd.read_csv(io.StringIO(decoded.decode('utf-8')))
-            return process_data(df)
+            df = pd.read_csv(io.StringIO(decoded.decode("utf-8")))
+            fig, description_table, overview_table = process_data(df)
+            return fig, description_table, overview_table
         except Exception as e:
-            return html.Div(f"Error processing the file: {str(e)}")
-
+            return {}, f"Error processing file: {str(e)}", "No data available"
     # Callback to toggle the modal's visibility when the "Upload Data" button is clicked
     @app.callback(
         Output("upload-modal", "is_open"),
