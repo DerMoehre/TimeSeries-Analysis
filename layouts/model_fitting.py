@@ -15,7 +15,12 @@ def model_fitting():
                             html.Label("Select Model:", className="form-label"),
                             dcc.Dropdown(
                                 id="model-fitting-dropdown",
-                                options=[],  # Dynamically populated
+                                options=[
+                                    "AutoARIMA",
+                                    "HoltWinters",
+                                    "SeasonalNaive",
+                                    "HistoricAverage",
+                                ],
                                 placeholder="Select Model",
                                 className="mb-3",
                                 style={
