@@ -2,6 +2,7 @@ from dash import Input, Output, State, callback_context
 import pandas as pd
 import base64, io
 from dash import html, dcc
+import dash
 import csv
 import plotly.express as px
 from layouts.main_content import main_content
@@ -78,12 +79,13 @@ def register_callbacks(app):
             Output("x-axis-column", "options"),
             Output("y-axis-column", "options"),
             Output("upload-status", "children"),
+            Output("uploaded-data-store", "data"),
         ],
         [Input("upload-data", "contents")],
     )
     def load_file(contents):
         if contents is None:
-            return [], [], "No file uploaded."
+            return [], [], "No file uploaded.", None
 
         content_type, content_string = contents.split(",", 1)
         decoded = base64.b64decode(content_string)
@@ -93,35 +95,72 @@ def register_callbacks(app):
 
             df = pd.read_csv(io.StringIO(decoded.decode("utf-8")), delimiter=delimiter)
 
-            # Store the uploaded data in a dcc.Store
-            app.layout.children.append(
-                dcc.Store(id="uploaded-data-store", data=df.to_dict("records"))
-            )
-
             column_options = [{"label": col, "value": col} for col in df.columns]
-            return column_options, column_options, f"Uploaded file with {len(df)} rows."
+            return (
+                column_options,
+                column_options,
+                f"Uploaded file with {len(df)} rows.",
+                df.to_dict("records"),
+            )
         except Exception as e:
-            return [], [], f"Error reading file: {e}"
+            return [], [], f"Error reading file: {e}", None
 
     @app.callback(
         [
             Output("overview-graph", "figure"),
             Output("description-table", "children"),
             Output("overview-table", "children"),
+            Output("transformed-data-store", "data"),
         ],
         [
+            Input("url", "pathname"),
             Input("x-axis-column", "value"),
             Input("y-axis-column", "value"),
             State("uploaded-data-store", "data"),
         ],
     )
-    def update_graph(x_col, y_col, data):
-        if data is None or not x_col or not y_col:
-            return {}, "No data available", "No data available"
+    def update_graph(pathname, x_col, y_col, data):
+        print("Checking layout components:")
+        print(app.layout)
 
-        df = pd.DataFrame(data)
-        fig, description_table, overview_table = process_data(df, x_col, y_col)
-        return fig, description_table, overview_table
+        if pathname != "/":
+            raise dash.exceptions.PreventUpdate
+
+        # Handle case where data or selected columns are missing
+        if data is None or not x_col or not y_col:
+            # Return a basic graph, empty tables, and no data in the store
+            fig = {
+                "data": [{"type": "scatter", "x": [], "y": []}],
+                "layout": {"title": "No Data Available"},
+            }
+            return fig, "No data available", "No data available", None
+
+        try:
+            # If data and columns are available, process and return the graph and tables
+            df = pd.DataFrame(data)
+            df_transformed = df[[x_col, y_col]].rename(
+                columns={x_col: "ds", y_col: "y"}
+            )
+            df_transformed.insert(0, "unique_id", "time-analysis")
+
+            fig, description_table, overview_table = process_data(df, x_col, y_col)
+            return (
+                fig,
+                description_table,
+                overview_table,
+                df_transformed.to_dict("records"),
+            )
+
+        except KeyError as e:
+            return (
+                {
+                    "data": [{"type": "scatter", "x": [], "y": []}],
+                    "layout": {"title": "Error"},
+                },
+                "Error processing data: Check selected columns.",
+                "No data available",
+                None,
+            )
 
     @app.callback(
         Output("upload-modal", "is_open"),
