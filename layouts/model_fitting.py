@@ -54,7 +54,7 @@ def model_fitting():
                     # Right side: Hyperparameter tuning table
                     dbc.Col(
                         [
-                            html.H5("Hyperparameter Tuning", className="mt-3"),
+                            html.Label("Hyperparameter Tuning", className="mt-3"),
                             dash_table.DataTable(
                                 id="hyperparameter-table",
                                 columns=[
