@@ -120,9 +120,6 @@ def register_callbacks(app):
         ],
     )
     def update_graph(pathname, x_col, y_col, data):
-        print("Checking layout components:")
-        print(app.layout)
-
         if pathname != "/":
             raise dash.exceptions.PreventUpdate
 

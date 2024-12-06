@@ -9,6 +9,18 @@ def model_fitting():
             dbc.Row(
                 [
                     dcc.Graph(id="model-fitting-graph"),
+                    html.Div(
+                        dcc.Slider(
+                            id="model-fitting-slider",
+                            min=0.5,
+                            max=0.8,
+                            step=0.05,
+                            value=0.7,
+                            marks={i: f"{i: .2}" for i in [0.5, 0.6, 0.7, 0.8]},
+                            tooltip={"placement": "bottom", "always_visible": True},
+                        ),
+                        style={"margin-top": "20px", "text-align": "center"},
+                    ),
                     dbc.Col(
                         [
                             html.Label("Select Model:", className="form-label"),
@@ -54,11 +66,12 @@ def model_fitting():
                                     {"name": "Value", "id": "value", "editable": True},
                                 ],
                                 data=[
-                                    {"parameter": "learning_rate", "value": ""},
-                                    {"parameter": "max_depth", "value": ""},
-                                    {"parameter": "n_estimators", "value": ""},
+                                    {"parameter": "freq", "value": ""},
+                                    {"parameter": "season_length", "value": ""},
                                 ],
                                 editable=True,
+                                persistence=True,
+                                persistence_type="session",
                                 style_table={"overflowX": "auto"},
                                 style_cell={
                                     "textAlign": "left",
