@@ -8,7 +8,13 @@ def model_fitting():
             html.H1("Model Fitting"),
             dbc.Row(
                 [
-                    dcc.Graph(id="model-fitting-graph"),
+                    dcc.Loading(
+                        id="loding-graph",
+                        type="circle",
+                        children=[
+                            dcc.Graph(id="model-fitting-graph"),
+                        ],
+                    ),
                     html.Div(
                         dcc.Slider(
                             id="model-fitting-slider",
