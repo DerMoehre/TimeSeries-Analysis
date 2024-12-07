@@ -43,6 +43,7 @@ def validate_model(model, training_data, testing_data, freq):
     combined_df = pd.concat(
         [training_data, testing_data, forecast_df], ignore_index=True
     )
+
     return combined_df
 
 
@@ -90,10 +91,6 @@ def validate_input_data(transformed_data, required_columns):
     df = pd.DataFrame(transformed_data)
     if not all(col in df.columns for col in required_columns):
         return None
-    try:
-        df["ds"] = pd.to_datetime(df["ds"])
-    except Exception as e:
-        raise ValueError("Error parsing 'ds' column as datetime: " + str(e))
     return df
 
 
@@ -109,54 +106,43 @@ def get_hyperparameter_value(hyperparameter_data, parameter_name):
     )
 
 
-def fit_model_and_prepare_data(df, model, freq):
-    """Fit the model to the data and prepare combined data for plotting."""
-    sf = StatsForecast(models=[model], freq=freq, n_jobs=-1)
-    sf.fit(df=df)
-
-    # Extract fitted values
-    fitted_values = model.model_.fittedvalues
-
-    # Combine original and fitted data
-    df["Type"] = "Original"
-    df_fitted = df.copy()
-    df_fitted["y"] = fitted_values
-    df_fitted["Type"] = "Fitted"
-
-    return pd.concat([df, df_fitted])
-
-
-def create_graph_with_slider(training_data, testing_data, forecast_data, slider_value):
+def create_graph_with_slider(testing_data, forecast_data, slider_value, selected_model):
     """Create a graph showing training, testing, and forecasted values."""
-    # Combine training, testing, and forecast data for visualization
-    training_data["Type"] = "Training"
-    testing_data["Type"] = "Testing"
-    forecast_data["Type"] = "Forecast"
 
-    combined_df = pd.concat([training_data, testing_data, forecast_data])
+    # Separate the forecast data for clarity
+    train_test_data = forecast_data[forecast_data["Type"].isin(["Training", "Testing"])]
+    forecast_only_data = forecast_data[forecast_data["Type"] == "Predicted"]
 
-    # Compute x-axis position for the slider based on the testing data
-    slider_index = int(slider_value * len(testing_data))
-    slider_x = testing_data.iloc[slider_index]["ds"]
+    train_test_data.to_csv("train_test.csv")
+    forecast_only_data.to_csv("forecast.csv")
 
-    # Plot the combined data
+    slider_x = add_vertical_line(slider_value, train_test_data)
+
+    # Base figure: Training and testing data
     fig = px.line(
-        combined_df,
+        train_test_data,
         x="ds",
         y="y",
         color="Type",
         title="Training, Testing, and Forecast",
+        labels={"ds": "Date", "y": "Value"},
     )
 
-    # Add the vertical line for the slider
+    # Add vertical line for slider
     fig.add_shape(
         type="line",
         x0=slider_x,
         x1=slider_x,
-        y0=combined_df["y"].min(),
-        y1=combined_df["y"].max(),
+        y0=min(train_test_data["y"].min(), forecast_only_data[selected_model].min()),
+        y1=max(train_test_data["y"].max(), forecast_only_data[selected_model].max()),
         line=dict(color="red", width=2, dash="dash"),
-        name="Slider Position",
+    )
+
+    # Add forecast line dynamically based on the selected model
+    fig.add_scatter(
+        mode="lines",
+        x=forecast_only_data["ds"],
+        y=forecast_only_data[selected_model],
     )
 
     return fig
@@ -233,17 +219,11 @@ def register_callbacks(app):
             training_data, testing_data = split_data(df, slider_value)
 
             # fit the model
-            print("starting forecast")
-            print(f"selected model: {model}")
-            print(f"len training: {len(training_data)}")
-            print(f"len test: {len(testing_data)}")
-            print(f"freq: {freq}")
             forecast = validate_model(model, training_data, testing_data, freq)
-            print(forecast.head())
 
             # Create the graph with a slider
             return create_graph_with_slider(
-                training_data, testing_data, forecast, slider_value
+                testing_data, forecast, slider_value, selected_model
             )
 
         # Default case

@@ -10,7 +10,7 @@ def model_fitting():
                 [
                     dcc.Loading(
                         id="loding-graph",
-                        type="circle",
+                        type="graph",
                         children=[
                             dcc.Graph(id="model-fitting-graph"),
                         ],
