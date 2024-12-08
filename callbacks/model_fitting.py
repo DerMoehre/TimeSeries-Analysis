@@ -113,9 +113,6 @@ def create_graph_with_slider(testing_data, forecast_data, slider_value, selected
     train_test_data = forecast_data[forecast_data["Type"].isin(["Training", "Testing"])]
     forecast_only_data = forecast_data[forecast_data["Type"] == "Predicted"]
 
-    train_test_data.to_csv("train_test.csv")
-    forecast_only_data.to_csv("forecast.csv")
-
     slider_x = add_vertical_line(slider_value, train_test_data)
 
     # Base figure: Training and testing data
