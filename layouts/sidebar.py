@@ -4,14 +4,14 @@ from layouts.modal import modal_layout
 
 sidebar_layout = html.Div(
     [
-         dbc.Row(
+        dbc.Row(
             dbc.Col(
                 html.Img(
-                    src='/assets/logo.jpg',  # Reference the image file in the 'assets' folder
-                    height='55px',  # Set a height for the image
-                    style={'marginBottom': '10px'}
+                    src="/assets/logo.jpg",  # Reference the image file in the 'assets' folder
+                    height="55px",  # Set a height for the image
+                    style={"marginBottom": "10px"},
                 ),
-                width={'size': 12, 'offset': 0}
+                width={"size": 12, "offset": 0},
             )
         ),
         html.Hr(),
@@ -25,9 +25,13 @@ sidebar_layout = html.Div(
             pills=True,
         ),
         html.Hr(),
-        dbc.Button("Upload Data", id="open-upload-modal", color="primary", className="mt-3"),
-        dbc.Button("Delete Uploaded Data", id="delete-data-button", color="danger", n_clicks=0),
-        modal_layout
+        dbc.Button(
+            "Upload Data", id="open-upload-modal", color="primary", className="mt-3"
+        ),
+        dbc.Button(
+            "Delete Uploaded Data", id="delete-data-button", color="danger", n_clicks=0
+        ),
+        modal_layout,
     ],
     style={
         "position": "fixed",
