@@ -2,6 +2,8 @@
 
 A **Time Series Analysis Dashboard** built using Python and Dash, designed for interactive data visualization, model fitting, and forecasting. This project leverages powerful forecasting models from **Nixtla's `statsforecast` package** and integrates them into a user-friendly, web-based application.
 
+![Video zu GIF Konverter](https://github.com/user-attachments/assets/30d88c44-5bd9-42ee-ab26-c87b366ff053)
+
 ## Features
 
 ### Data Upload and Management
