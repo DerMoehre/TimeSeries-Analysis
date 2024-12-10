@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 from layouts.sidebar import sidebar_layout
 from layouts.overview import overview_layout
 from layouts.model_fitting import model_fitting
+from layouts.forecast import forecasting
 from callbacks import register_callbacks
 
 # Initialize app
@@ -39,8 +40,10 @@ app.layout = html.Div(
 def update_layout(pathname):
     if pathname == "/":
         return overview_layout()
-    elif pathname == "/model":  # Home page
-        return model_fitting()  # Use overview layout for the home page
+    elif pathname == "/model":
+        return model_fitting()
+    elif pathname == "/forecast":
+        return forecasting()
     else:  # Handle unknown URLs
         return html.Div("404: Page not found.", className="error-page")
 
