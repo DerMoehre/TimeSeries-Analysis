@@ -21,6 +21,7 @@ app.layout = html.Div(
         dcc.Store(id="uploaded-data-store", storage_type="session"),
         dcc.Store(id="transformed-data-store", storage_type="session"),
         dcc.Store(id="model-data-store", data=[], storage_type="session"),
+        dcc.Store(id="selected-model-store"),
         dbc.Row(
             [
                 dbc.Col(sidebar_layout, width=2),  # Static sidebar

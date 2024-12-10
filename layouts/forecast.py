@@ -9,10 +9,10 @@ def forecasting():
             dbc.Row(
                 [
                     dcc.Loading(
-                        id="loding-graph",
+                        id="forecast-graph",
                         type="graph",
                         children=[
-                            dcc.Graph(id="model-fitting-graph"),
+                            dcc.Graph(id="model-forecast-graph"),
                         ],
                     ),
                     dbc.Col(

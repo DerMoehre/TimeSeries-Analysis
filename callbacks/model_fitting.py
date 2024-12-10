@@ -147,6 +147,13 @@ def create_graph_with_slider(testing_data, forecast_data, slider_value, selected
 
 def register_callbacks(app):
     @app.callback(
+        Output("selected-model-store", "data"),
+        Input("model-fitting-dropdown", "value"),
+    )
+    def save_selected_model(selected_model):
+        return selected_model
+
+    @app.callback(
         Output("model-fitting-graph", "figure"),
         [
             Input("uploaded-data-store", "data"),
