@@ -1,7 +1,7 @@
 /* Scrollable overview table */
 .scrollable-overview-table {
-    height: 300px;  /* Set a fixed height */
-    overflow-y: auto;  /* Enable vertical scrolling when content exceeds height */
+    height: 300px; /* Set a fixed height */
+    overflow-y: auto; /* Enable vertical scrolling when content exceeds height */
     margin-top: 10px;
 }
 
@@ -13,10 +13,96 @@
 
 /* Individual table containers */
 .table-column {
-    width: 48%;  /* Each table takes up 48% of the width */
+    width: 48%; /* Each table takes up 48% of the width */
 }
 
 /* Optional: Add margin to separate tables */
 .table-column + .table-column {
-    margin-left: 2%;  /* Add margin between tables */
+    margin-left: 2%; /* Add margin between tables */
+}
+
+/* Forecasting Section */
+.forecast-graph-container {
+    margin-top: 20px;
+}
+
+.forecast-run-button {
+    width: auto;
+    margin-top: 10px;
+}
+
+.forecast-horizon-table {
+    overflow-x: auto;
+}
+
+.forecast-horizon-cell {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid lightgrey;
+}
+
+.forecast-horizon-header {
+    background-color: rgb(230, 230, 230);
+    font-weight: bold;
+}
+
+/* Model Fitting Section */
+.model-fitting-slider-container {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.model-fitting-dropdown {
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
+    margin-bottom: 15px;
+}
+
+.model-fitting-table {
+    overflow-x: auto;
+}
+
+.model-fitting-cell {
+    text-align: left;
+    padding: 10px;
+    border: 1px solid lightgrey;
+}
+
+.model-fitting-header {
+    background-color: rgb(230, 230, 230);
+    font-weight: bold;
+}
+
+/* Sidebar Section */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    padding: 10px;
+    background-color: #343a40;
+    color: white;
+}
+
+.sidebar-logo {
+    height: 55px;
+    margin-bottom: 10px;
+}
+
+.sidebar-nav-link {
+    margin-bottom: 10px;
+}
+
+.sidebar-upload-button {
+    margin-top: 10px;
+}
+
+.sidebar-delete-button {
+    margin-top: 10px;
+    background-color: red;
+    color: white;
 }

@@ -25,7 +25,7 @@ def model_fitting():
                             marks={i: f"{i: .2}" for i in [0.5, 0.6, 0.7, 0.8]},
                             tooltip={"placement": "bottom", "always_visible": True},
                         ),
-                        style={"margin-top": "20px", "text-align": "center"},
+                        className="model-fitting-slider-container",
                     ),
                     dbc.Col(
                         [
@@ -39,14 +39,7 @@ def model_fitting():
                                     "HistoricAverage",
                                 ],
                                 placeholder="Select Model",
-                                className="mb-3",
-                                style={
-                                    "width": "100%",
-                                    "padding": "5px",
-                                    "borderRadius": "5px",
-                                    "border": "1px solid #ced4da",
-                                    "boxShadow": "0px 1px 2px rgba(0, 0, 0, 0.1)",
-                                },
+                                className="mb-3, model-fitting-dropdown",
                             ),
                             html.Button(
                                 "Run Model",
@@ -78,16 +71,8 @@ def model_fitting():
                                 editable=True,
                                 persistence=True,
                                 persistence_type="session",
-                                style_table={"overflowX": "auto"},
-                                style_cell={
-                                    "textAlign": "left",
-                                    "padding": "10px",
-                                    "border": "1px solid lightgrey",
-                                },
-                                style_header={
-                                    "backgroundColor": "rgb(230, 230, 230)",
-                                    "fontWeight": "bold",
-                                },
+                                style_cell={"className": "model-fitting-cell"},
+                                style_header={"className": "model-fitting-header"},
                             ),
                         ],
                         width=6,
