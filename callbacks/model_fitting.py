@@ -106,6 +106,46 @@ def get_hyperparameter_value(hyperparameter_data, parameter_name):
     )
 
 
+def create_model_graph(
+    slider_value,
+    selected_model,
+    hyperparameter_data,
+    transformed_data,
+):
+    # Validate data
+    df = validate_input_data(transformed_data, ["ds", "y", "unique_id"])
+    if df is None:
+        return check_upload_data(transformed_data, "Invalid data format", slider_value)
+    # Extract hyperparameters
+    freq = get_hyperparameter_value(hyperparameter_data, "freq")
+    season_length = get_hyperparameter_value(hyperparameter_data, "season_length")
+    if not freq:
+        return check_upload_data(
+            transformed_data, "Frequency parameter is required", slider_value
+        )
+    if not season_length:
+        return check_upload_data(
+            transformed_data,
+            "Season length parameter is required",
+            slider_value,
+        )
+    # Select and fit the model
+    model = get_model(selected_model, season_length)
+    if not model:
+        return check_upload_data(
+            transformed_data, "Invalid model selected", slider_value
+        )
+    # Split data into training und testing sets
+    training_data, testing_data = split_data(df, slider_value)
+    # fitted_model = fit_model(model, training_data, freq)
+    # fit the model
+    forecast = validate_model(model, training_data, testing_data, freq)
+    # Create the graph with a slider
+    return create_graph_with_slider(
+        testing_data, forecast, slider_value, selected_model
+    )
+
+
 def create_graph_with_slider(testing_data, forecast_data, slider_value, selected_model):
     """Create a graph showing training, testing, and forecasted values."""
 
@@ -153,6 +193,16 @@ def register_callbacks(app):
     def save_selected_model(selected_model):
         return selected_model
 
+    # @app.callback(
+    #    Output("fitted-model-store", "data"),
+    #    [
+    #       Input()
+    #    ]
+    # )
+    def fit_model(model, training_data, freq=-1):
+        sf = StatsForecast(models=[model], freq=freq, n_jobs=-1)
+        return sf.fit(df=training_data)
+
     @app.callback(
         Output("model-fitting-graph", "figure"),
         [
@@ -187,48 +237,6 @@ def register_callbacks(app):
                 return check_upload_data(
                     transformed_data, "No data or model selected", slider_value
                 )
-
-            # Validate data
-            df = validate_input_data(transformed_data, ["ds", "y", "unique_id"])
-            if df is None:
-                return check_upload_data(
-                    transformed_data, "Invalid data format", slider_value
-                )
-
-            # Extract hyperparameters
-            freq = get_hyperparameter_value(hyperparameter_data, "freq")
-            season_length = get_hyperparameter_value(
-                hyperparameter_data, "season_length"
+            return create_model_graph(
+                slider_value, selected_model, hyperparameter_data, transformed_data
             )
-
-            if not freq:
-                return check_upload_data(
-                    transformed_data, "Frequency parameter is required", slider_value
-                )
-            if not season_length:
-                return check_upload_data(
-                    transformed_data,
-                    "Season length parameter is required",
-                    slider_value,
-                )
-
-            # Select and fit the model
-            model = get_model(selected_model, season_length)
-            if not model:
-                return check_upload_data(
-                    transformed_data, "Invalid model selected", slider_value
-                )
-
-            # Split data into training und testing sets
-            training_data, testing_data = split_data(df, slider_value)
-
-            # fit the model
-            forecast = validate_model(model, training_data, testing_data, freq)
-
-            # Create the graph with a slider
-            return create_graph_with_slider(
-                testing_data, forecast, slider_value, selected_model
-            )
-
-        # Default case
-        return check_upload_data(transformed_data, "Uploaded Data", slider_value)
