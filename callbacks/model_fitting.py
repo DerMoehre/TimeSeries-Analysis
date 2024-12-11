@@ -186,14 +186,14 @@ def register_callbacks(app):
         Input("model-fitting-dropdown", "value"),
     )
     def save_selected_model(selected_model):
-        return selected_model
+        return selected_model or None
 
     @app.callback(
         Output("hyperparameters-store", "data"),
         Input("hyperparameter-table", "data"),
     )
     def store_hyperparameter(hyperparameter_data):
-        return get_hyperparameter_value(hyperparameter_data)
+        return get_hyperparameter_value(hyperparameter_data) or None
 
     @app.callback(
         Output("model-fitting-graph", "figure"),
@@ -225,9 +225,17 @@ def register_callbacks(app):
 
         # Handle "Run Model" button trigger
         if trigger_id == "run-model-button":
-            if not transformed_data or not selected_model:
+            if not transformed_data:
                 return check_upload_data(
-                    transformed_data, "No data or model selected", slider_value
+                    transformed_data, "No data uploaded", slider_value
+                )
+            if not selected_model:
+                return check_upload_data(
+                    transformed_data, "No model selected", slider_value
+                )
+            if not hyperparameter_data:
+                return check_upload_data(
+                    transformed_data, "No hyperparameters provided", slider_value
                 )
             return create_model_graph(
                 slider_value, selected_model, hyperparameter_data, transformed_data
