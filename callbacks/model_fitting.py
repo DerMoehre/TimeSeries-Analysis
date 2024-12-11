@@ -94,16 +94,9 @@ def validate_input_data(transformed_data, required_columns):
     return df
 
 
-def get_hyperparameter_value(hyperparameter_data, parameter_name):
-    """Extract a hyperparameter value from the hyperparameter data."""
-    return next(
-        (
-            row["value"]
-            for row in hyperparameter_data
-            if row["parameter"] == parameter_name
-        ),
-        None,
-    )
+def get_hyperparameter_value(hyperparameter_data):
+    """Extract all hyperparameter values from the hyperparameter data."""
+    return {row["parameter"]: row["value"] for row in hyperparameter_data}
 
 
 def create_model_graph(
@@ -117,8 +110,10 @@ def create_model_graph(
     if df is None:
         return check_upload_data(transformed_data, "Invalid data format", slider_value)
     # Extract hyperparameters
-    freq = get_hyperparameter_value(hyperparameter_data, "freq")
-    season_length = get_hyperparameter_value(hyperparameter_data, "season_length")
+    hyperparameter = get_hyperparameter_value(hyperparameter_data)
+
+    freq = hyperparameter.get("freq")
+    season_length = hyperparameter.get("season_length")
     if not freq:
         return check_upload_data(
             transformed_data, "Frequency parameter is required", slider_value
@@ -192,6 +187,13 @@ def register_callbacks(app):
     )
     def save_selected_model(selected_model):
         return selected_model
+
+    @app.callback(
+        Output("hyperparameters-store", "data"),
+        Input("hyperparameter-table", "data"),
+    )
+    def store_hyperparameter(hyperparameter_data):
+        return get_hyperparameter_value(hyperparameter_data)
 
     @app.callback(
         Output("model-fitting-graph", "figure"),

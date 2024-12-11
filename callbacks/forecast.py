@@ -2,6 +2,9 @@ from dash import Input, Output, State, callback_context
 import plotly.express as px
 import pandas as pd
 
+from statsforecast import StatsForecast
+from statsforecast.models import AutoARIMA, SeasonalNaive, HoltWinters, HistoricAverage
+
 
 def check_upload_data(uploaded_data, title):
     """Helper function to create a graph from uploaded data"""
@@ -14,6 +17,24 @@ def check_upload_data(uploaded_data, title):
 
 
 def register_callbacks(app):
+    @app.callback(
+        Input("uploaded-data-store", "data"),
+        Input("selected-model-store", "data"),
+        Input("hyperparameter-store", "data"),
+        State("forecast-horizon", "data"),
+    )
+    def forecast_data(df, model, parameter, horizon):
+        freq = parameter.get("freq")
+
+        sf = StatsForecast(models=[model], freq=freq, n_jobs=-1)
+        sf.fit(df=df)
+
+        forecast_df = sf.forecast(h=horizon, df=df)
+
+        print()
+
+        return forecast_df
+
     @app.callback(
         Output("model-forecast-graph", "figure"),
         Input("run-forecast-button", "n_clicks"),

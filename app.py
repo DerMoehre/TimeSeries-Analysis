@@ -22,6 +22,7 @@ app.layout = html.Div(
         dcc.Store(id="transformed-data-store", storage_type="session"),
         dcc.Store(id="model-data-store", data=[], storage_type="session"),
         dcc.Store(id="selected-model-store"),
+        dcc.Store(id="hyperparameter-store"),
         dcc.Store(id="fitted-model-store"),
         dbc.Row(
             [
