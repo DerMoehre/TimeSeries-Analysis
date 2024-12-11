@@ -12,7 +12,9 @@ def model_fitting():
                         id="loding-graph",
                         type="graph",
                         children=[
-                            dcc.Graph(id="model-fitting-graph"),
+                            dcc.Graph(
+                                id="model-fitting-graph", className="graph-style"
+                            ),
                         ],
                     ),
                     html.Div(

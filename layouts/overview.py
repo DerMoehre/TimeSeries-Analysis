@@ -6,7 +6,7 @@ def overview_layout():
     return html.Div(
         [
             html.H1("Data Overview"),
-            dcc.Graph(id="overview-graph"),
+            dcc.Graph(id="overview-graph", responsive=True, className="graph-style"),
             dbc.Row(
                 [
                     dbc.Col(html.Div(id="description-table"), width=6),

@@ -21,10 +21,13 @@
     margin-left: 2%; /* Add margin between tables */
 }
 
-/* Forecasting Section */
-.forecast-graph-container {
+.graph-style {
+    flex: 1;
+    min-width: 700;
     margin-top: 20px;
 }
+
+/* Forecasting Section */
 
 .forecast-run-button {
     width: auto;
@@ -50,6 +53,14 @@
 .model-fitting-slider-container {
     margin-top: 20px;
     text-align: center;
+}
+
+.rc-slider-rail {
+    background-color: #a6a6a6;
+}
+
+.rc-slider-track, .rc-slider-dot {
+    background-color: #18bc9c;
 }
 
 .model-fitting-dropdown {
@@ -86,6 +97,7 @@
     padding: 10px;
     background-color: #343a40;
     color: white;
+    z-index: 1000;
 }
 
 .sidebar-logo {
@@ -105,4 +117,44 @@
     margin-top: 10px;
     background-color: red;
     color: white;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 250px;
+    padding: 10px;
+    transition: margin-left 0.3s ease;
+}
+
+/* Adjustments for smaller screens */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        position: static; /* Sidebar becomes part of the normal flow */
+        width: 100%;
+        height: auto; /* Adjust height for smaller screens */
+        padding: 5px;
+    }
+    .main-content {
+        margin-left: 0; /* Remove margin when sidebar is stacked */
+    }
+}
+
+/* Collapsible sidebar toggle (optional improvement) */
+.sidebar-toggle {
+    display: none; /* Hide by default */
+}
+
+@media screen and (max-width: 768px) {
+    .sidebar-toggle {
+        display: block; /* Show toggle button on small screens */
+        background-color: #343a40;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        cursor: pointer;
+    }
+}
+
+.sidebar.collapsed {
+    display: none; /* Hide sidebar when collapsed */
 }

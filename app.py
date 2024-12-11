@@ -11,6 +11,7 @@ app = Dash(
     __name__,
     external_stylesheets=[dbc.themes.FLATLY],
     suppress_callback_exceptions=True,
+    meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],
 )
 app.title = "Murtfeldt TimeSeries Analysis"
 
@@ -24,13 +25,14 @@ app.layout = html.Div(
         dcc.Store(id="selected-model-store", storage_type="session"),
         dcc.Store(id="hyperparameters-store", storage_type="session"),
         dcc.Store(id="fitted-model-store", storage_type="session"),
-        dbc.Row(
-            [
-                dbc.Col(sidebar_layout, width=2),  # Static sidebar
-                dbc.Col(html.Div(id="main-content"), width=10),  # Dynamic main content
-            ]
+        html.Div(
+            className="sidebar",  # Sidebar styling controlled via CSS
+            children=sidebar_layout,
         ),
-        # modal_layout,
+        html.Div(
+            className="main-content",  # Main content styling controlled via CSS
+            children=html.Div(id="main-content"),
+        ),
     ]
 )
 

@@ -14,7 +14,7 @@ def forecasting():
                         children=[
                             dcc.Graph(
                                 id="model-forecast-graph",
-                                className="forecast-graph-container",
+                                className="graph-style",
                             ),
                         ],
                     ),
