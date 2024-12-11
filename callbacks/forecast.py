@@ -27,13 +27,10 @@ def register_callbacks(app):
         trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
 
         # Handle uploaded data display
-        if trigger_id == "uploaded-data-store" or trigger_id != "run-forecast-button":
+        if trigger_id != "run-forecast-button":
             return check_upload_data(uploaded_data, "Uploaded Data")
 
         # Handle "Run Model" button trigger
         if trigger_id == "run-forecast-button":
             if not uploaded_data or not selected_model:
                 return check_upload_data(uploaded_data, "No data or model selected")
-
-        # Default
-        return check_upload_data(uploaded_data, "Uploaded Data")

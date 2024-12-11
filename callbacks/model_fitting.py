@@ -137,7 +137,7 @@ def create_model_graph(
         )
     # Split data into training und testing sets
     training_data, testing_data = split_data(df, slider_value)
-    # fitted_model = fit_model(model, training_data, freq)
+
     # fit the model
     forecast = validate_model(model, training_data, testing_data, freq)
     # Create the graph with a slider
@@ -192,16 +192,6 @@ def register_callbacks(app):
     )
     def save_selected_model(selected_model):
         return selected_model
-
-    # @app.callback(
-    #    Output("fitted-model-store", "data"),
-    #    [
-    #       Input()
-    #    ]
-    # )
-    def fit_model(model, training_data, freq=-1):
-        sf = StatsForecast(models=[model], freq=freq, n_jobs=-1)
-        return sf.fit(df=training_data)
 
     @app.callback(
         Output("model-fitting-graph", "figure"),
