@@ -37,17 +37,8 @@ def process_data(df, x_col=None, y_col=None):
         description, striped=True, bordered=True, hover=True
     )
 
-    overview_table = dbc.Table.from_dataframe(
-        df, striped=True, bordered=True, hover=True
-    )
-    # Scrollable overview table
-    overview_table_scrollable = html.Div(
-        overview_table,
-        className="scrollable-overview-table",
-    )
-
     # Return content
-    return fig, description_table, overview_table_scrollable
+    return fig, description_table
 
 
 def register_callbacks(app):
@@ -86,7 +77,6 @@ def register_callbacks(app):
         [
             Output("overview-graph", "figure"),
             Output("description-table", "children"),
-            Output("overview-table", "children"),
             Output("transformed-data-store", "data"),
         ],
         [
@@ -104,7 +94,7 @@ def register_callbacks(app):
         if data is None or not x_col or not y_col:
             # Return a basic graph, empty tables, and no data in the store
             fig = {}
-            return fig, "No data available", "No data available", None
+            return fig, "No data available", None
 
         try:
             # If data and columns are available, process and return the graph and tables
@@ -114,11 +104,10 @@ def register_callbacks(app):
             )
             df_transformed.insert(0, "unique_id", "time-analysis")
 
-            fig, description_table, overview_table = process_data(df, x_col, y_col)
+            fig, description_table = process_data(df, x_col, y_col)
             return (
                 fig,
                 description_table,
-                overview_table,
                 df_transformed.to_dict("records"),
             )
 

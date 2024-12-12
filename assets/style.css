@@ -1,4 +1,9 @@
-.body {
+* {
+    box-sizing: border-box;
+}
+
+
+body {
     overflow-x: hidden;
 }
 
@@ -11,8 +16,28 @@
 
 /* Container for tables side by side */
 .table-container {
+    display: block;
+    overflow-x: auto;
+
+}
+
+.overview-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+}
+
+.graph-style {
+    margin-bottom: 20px; /* Add space between graph and table */
+    max-width: 100%;
+    overflow: hidden;
+}
+
+#description-table {
+    max-width: 100%;
+    margin-top: 20px; /* Add spacing above the table */
+    overflow-x: auto;
+    margin-left: auto; /* Center table horizontally */
+    margin-right: auto; /* Center table horizontally */
 }
 
 /* Individual table containers */
@@ -29,6 +54,7 @@
     flex: 1;
     min-width: 700;
     margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 /* Forecasting Section */
