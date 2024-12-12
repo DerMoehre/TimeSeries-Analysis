@@ -33,36 +33,13 @@ def process_data(df, x_col=None, y_col=None):
     # Data description
     description = df.describe()
     description.insert(0, "Metric", description.index)
-    description_table = html.Table(
-        [
-            html.Thead(html.Tr([html.Th(col) for col in description.columns])),
-            html.Tbody(
-                [
-                    html.Tr(
-                        [
-                            html.Td(description.iloc[row][col])
-                            for col in description.columns
-                        ]
-                    )
-                    for row in range(len(description))
-                ]
-            ),
-        ]
+    description_table = dbc.Table.from_dataframe(
+        description, striped=True, bordered=True, hover=True
     )
 
-    # Data overview
-    overview_table = html.Table(
-        [
-            html.Thead(html.Tr([html.Th(col) for col in df.columns])),
-            html.Tbody(
-                [
-                    html.Tr([html.Td(df.iloc[row][col]) for col in df.columns])
-                    for row in range(len(df))
-                ]
-            ),
-        ]
+    overview_table = dbc.Table.from_dataframe(
+        df, striped=True, bordered=True, hover=True
     )
-
     # Scrollable overview table
     overview_table_scrollable = html.Div(
         overview_table,
@@ -126,10 +103,7 @@ def register_callbacks(app):
         # Handle case where data or selected columns are missing
         if data is None or not x_col or not y_col:
             # Return a basic graph, empty tables, and no data in the store
-            fig = {
-                "data": [{"type": "scatter", "x": [], "y": []}],
-                "layout": {"title": "No Data Available"},
-            }
+            fig = {}
             return fig, "No data available", "No data available", None
 
         try:

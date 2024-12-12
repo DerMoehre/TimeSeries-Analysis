@@ -1,3 +1,7 @@
+.body {
+    overflow-x: hidden;
+}
+
 /* Scrollable overview table */
 .scrollable-overview-table {
     height: 300px; /* Set a fixed height */
@@ -109,14 +113,14 @@
     margin-bottom: 10px;
 }
 
-.sidebar-upload-button {
-    margin-top: 10px;
+.nav-link.active {
+    background-color: #18bc9c !important;
+    color: #343a40 !important;
 }
 
-.sidebar-delete-button {
+.sidebar-upload-button {
     margin-top: 10px;
-    background-color: red;
-    color: white;
+    background-color: #18bc9c;
 }
 
 /* Main Content */
